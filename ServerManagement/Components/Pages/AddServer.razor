@@ -1,26 +1,20 @@
-﻿@page   "/editserver/{id:int}"
+﻿@page "/Servers/Add"
 
 @inject NavigationManager NavigationManager
 
 <div class="row">
     <h3>
-        Edit Server @Id
+        Add New Server
     </h3>
 </div>
 
 <div class="row">
-    @if (server is null)
-    {
-        <p>Loading server ...</p>
-    }
-    else
+    @if (server is not null)
     {
         <EditForm Model="server" FormName="formServer" OnValidSubmit="Submit">
             <DataAnnotationsValidator />
             <ValidationSummary />
 
-            <InputNumber @bind-Value="server.Id" hidden />
-            
             <div class="row mb-3">
                 <div class="col-2">
                     <label class="col-form-label">Name</label>
@@ -54,7 +48,7 @@
 
             <div class="row mb-3">
                 <div class=" col-1">
-                    <button type="submit" class="btn btn-primary">Update</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
                 </div>
             </div>
         </EditForm>
@@ -70,24 +64,13 @@
 </div>
 
 @code {
-    [Parameter]
-    public int Id { get; set; }
-
     [SupplyParameterFromForm(FormName = "formServer")]
-    public Server? server { get; set; }
-
-    protected override void OnParametersSet()
-    {
-        server ??= ServersRepository.GetServerById(Id);
-
-    }
+    public Server server { get; set; } = new() { IsOnline = false};
 
     private void Submit()
     {
-        if (server is not null)
-        {
-            ServersRepository.UpdateServer(Id, server);
-        }
+        // Code to add server
+        ServersRepository.AddServer(server);
 
         NavigationManager.NavigateTo("/servers");
     }
