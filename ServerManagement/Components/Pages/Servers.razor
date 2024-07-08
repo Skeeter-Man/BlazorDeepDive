@@ -25,18 +25,23 @@
     </div>
 
     <br />
-    <div class="row mb-3">
-        <a href="Servers/Add" class="btn btn-success">Add Server</a>
-    </div>
+    <button type="button" class="btn btn-primary" @onclick="@(()=> { servers = ServersRepository.GetServers(); })">Show All </button>
 
 </div>
 
 <br />
+
+<div class="input-group mb-3">
+    <input type="text" class="form-control" placeholder="Search Servers" @bind-value="serverFilter" @bind-value:event="oninput" />
+    <button class="btn btn-primary" type="button" id="button-search" @onclick="HandleSearch">Search</button>
+</div>
+
+<br />
+
 <div class="row">
     <ul>
-        @foreach (var server in servers)
-        {
-            <li class="mb-1">
+        <Virtualize Items="this.servers" Context="server">
+            <li @key="server.Id" class="mb-1">
                 @server.Name in @server.City is
                 <span style="color:@(server.IsOnline ? "green" : "red")">
                     @(server.IsOnline ? "online" : "offline")
@@ -52,10 +57,22 @@
                 </EditForm>
 
             </li>
-        }
+        </Virtualize>
     </ul>
 
-    <button type="button" class="btn btn-primary" @onclick="@(()=> { servers = ServersRepository.GetServers(); })">Show All </button>
+    <div class="row mb-3">
+        <a href="Servers/Add" class="btn btn-success">Add Server</a>
+    </div>
+
+    <div class="row mb-3">
+        <button class="btn btn-primary"
+                @onclick="@(()=>
+                            {
+                                this.servers.Insert(0, new Server { Name = "ServerA1", City="Toronto" });
+                            })">
+            Add Server 3
+        </button>
+    </div>
 
 </div>
 
@@ -66,8 +83,16 @@
 
     private string selectedCity = "Toronto";
 
-
-
+    private string _serverFilter = "";
+    private string serverFilter
+    {
+        get => _serverFilter;
+        set
+        {
+            _serverFilter = value;
+            HandleSearch();
+        }
+    }
 
     private void DeleteServer(int serverId)
     {
@@ -81,6 +106,21 @@
     private void SelectCity(string cityName)
     {
         this.selectedCity = cityName;
+
         servers = ServersRepository.GetServersByCity(this.selectedCity);
+
+        //if (cityName == "Halifax")
+        //{
+        //    for (int i = 16; i < 2000; i++)
+        //    {
+        //        servers.Add(new Server { Id = i, Name=$"Server-{i}", City = "Halifax", IsOnline = false });
+        //    }
+        //}
+    }
+
+    private void HandleSearch()
+    {
+        this.servers = ServersRepository.SearchServers(serverFilter);
+        this.selectedCity = string.Empty;
     }
 }
