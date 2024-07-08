@@ -2,6 +2,8 @@
 
 @inject NavigationManager NavigationManager
 
+@rendermode InteractiveServer
+
 <h3>Servers</h3>
 <br />
 <br />
@@ -11,12 +13,11 @@
         @foreach (var city in Cities)
         {
             <div class="col">
-                <div class="card">
+                <div class="card @(selectedCity.Equals(city, StringComparison.OrdinalIgnoreCase)?"border-primary":"")">
                     <img src="/images/@($"{city}.png")" class="card-img-top" alt="@($"{city}.png")">
                     <div class="card-body">
                         <h5 class="card-title">@city</h5>
-                        <p class="card-text">Click the button below to filter by the city of @city</p>
-                        <a href="/servers/#" class="btn btn-primary">Filter by @city</a>
+                        <button type="button" class="btn btn-primary" @onclick="@(()=> { SelectCity(city); })">@city</button>
                     </div>
                 </div>
             </div>
@@ -29,6 +30,8 @@
     </div>
 
 </div>
+
+<br />
 <div class="row">
     <ul>
         @foreach (var server in servers)
@@ -41,6 +44,7 @@
                 <a href="/editserver/@server.Id">Edit @server.Name</a>
 
                 <EditForm Model="server"
+                          Enhance="true"
                           FormName="@($"form-server-{server.Id}")"
                           OnValidSubmit="@(() => { DeleteServer(server.Id); } )">
 
@@ -50,11 +54,20 @@
             </li>
         }
     </ul>
+
+    <button type="button" class="btn btn-primary" @onclick="@(()=> { servers = ServersRepository.GetServers(); })">Show All </button>
+
 </div>
 
 @code {
-    public List<Server> servers { get; set; } = ServersRepository.GetServers();
-    public List<string> Cities { get; set; } = CitiesRepository.GetCities();
+    private List<Server> servers { get; set; } = ServersRepository.GetServersByCity("Toronto");
+
+    private List<string> Cities { get; set; } = CitiesRepository.GetCities();
+
+    private string selectedCity = "Toronto";
+
+
+
 
     private void DeleteServer(int serverId)
     {
@@ -63,5 +76,11 @@
             ServersRepository.DeleteServer(serverId);
             NavigationManager.Refresh();
         }
+    }
+
+    private void SelectCity(string cityName)
+    {
+        this.selectedCity = cityName;
+        servers = ServersRepository.GetServersByCity(this.selectedCity);
     }
 }
