@@ -1,0 +1,21 @@
+﻿@page "/todolist"
+
+<h3>To Do </h3>
+<br />
+
+@if (items is not null && items.Count > 0)
+{
+    <ul>
+        @foreach (var item in items)
+        {
+            <li @key="item.Id">
+                @item.Name
+            </li>
+        }
+    </ul>
+
+}
+
+@code {
+    public List<ToDoItem> items { get; set; } = ToDoItemRepository.GetItems();
+}
