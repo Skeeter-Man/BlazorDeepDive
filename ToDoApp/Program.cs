@@ -3,8 +3,7 @@ using ToDoApp.Components;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddRazorComponents()
-    .AddInteractiveToDoItemComponents();
+builder.Services.AddRazorComponents();
 
 var app = builder.Build();
 
@@ -21,7 +20,6 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseAntiforgery();
 
-app.MapRazorComponents<App>()
-    .AddInteractiveToDoItemRenderMode();
+app.MapRazorComponents<App>();
 
 app.Run();
